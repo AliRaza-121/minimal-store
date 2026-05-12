@@ -57,7 +57,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -84,42 +84,53 @@ export default function AdminDashboard() {
           <p className="text-muted text-sm font-light">No orders yet</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-dark-border">
-                  <th className="pb-3 text-xs text-muted tracking-widest uppercase font-medium">Order ID</th>
-                  <th className="pb-3 text-xs text-muted tracking-widest uppercase font-medium">Customer</th>
-                  <th className="pb-3 text-xs text-muted tracking-widest uppercase font-medium">Total</th>
-                  <th className="pb-3 text-xs text-muted tracking-widest uppercase font-medium">Status</th>
-                  <th className="pb-3 text-xs text-muted tracking-widest uppercase font-medium">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.map((order) => (
-                  <tr key={order._id} className="border-b border-dark-border/50">
-                    <td className="py-3 text-sm text-light font-light">
-                      #{order._id.slice(-6).toUpperCase()}
-                    </td>
-                    <td className="py-3 text-sm text-muted font-light">{order.customer?.name || 'Guest'}</td>
-                    <td className="py-3 text-sm text-gold font-light">Rs. {order.total}</td>
-                    <td className="py-3">
-                      <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 font-medium
-                        ${order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
-                          order.status === 'confirmed' ? 'bg-blue-500/10 text-blue-500' :
-                          order.status === 'shipped' ? 'bg-purple-500/10 text-purple-500' :
-                          'bg-emerald-500/10 text-emerald-500'
-                        }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="py-3 text-xs text-muted font-light">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+  <table className="w-full text-left">
+    <thead>
+      <tr className="border-b border-dark-border">
+        <th className="pb-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Order</th>
+        <th className="pb-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden sm:table-cell">Customer</th>
+        <th className="pb-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Total</th>
+        <th className="pb-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Status</th>
+        <th className="pb-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden sm:table-cell">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {recentOrders.map((order) => (
+        <tr key={order._id} className="border-b border-dark-border/50">
+          <td className="py-3 px-3 sm:px-4">
+            <div>
+              <span className="text-xs sm:text-sm text-light font-light font-mono">
+                #{order._id.slice(-6).toUpperCase()}
+              </span>
+              <span className="text-[10px] text-muted block sm:hidden">
+                {order.customer?.name || 'Guest'} · {new Date(order.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+          </td>
+          <td className="py-3 px-3 sm:px-4 text-sm text-muted font-light hidden sm:table-cell">
+            {order.customer?.name || 'Guest'}
+          </td>
+          <td className="py-3 px-3 sm:px-4">
+            <span className="text-sm text-gold font-light">Rs. {order.total}</span>
+          </td>
+          <td className="py-3 px-3 sm:px-4">
+            <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 font-medium
+              ${order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
+                order.status === 'confirmed' ? 'bg-blue-500/10 text-blue-500' :
+                order.status === 'shipped' ? 'bg-purple-500/10 text-purple-500' :
+                'bg-emerald-500/10 text-emerald-500'
+              }`}>
+              {order.status}
+            </span>
+          </td>
+          <td className="py-3 px-3 sm:px-4 text-xs text-muted font-light hidden sm:table-cell">
+            {new Date(order.createdAt).toLocaleDateString()}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
         )}
       </div>
     </div>

@@ -76,21 +76,39 @@ const sidebarLinks = [
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const toggleSidebar = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setMobileOpen(!mobileOpen)
+    } else {
+      setCollapsed(!collapsed)
+    }
+  }
+
+  const closeMobile = () => setMobileOpen(false)
 
   return (
     <div className="min-h-screen bg-dark-bg flex">
       
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-30 bg-black/60 md:hidden" onClick={closeMobile} />
+      )}
+
       {/* Sidebar */}
       <motion.aside
         animate={{ width: collapsed ? 80 : 260 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="bg-dark-card border-r border-dark-border flex flex-col fixed left-0 top-0 bottom-0 z-40 overflow-hidden"
+        className={`bg-dark-card border-r border-dark-border flex flex-col fixed left-0 top-0 bottom-0 z-40 overflow-hidden
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} 
+          md:translate-x-0`}
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-dark-border">
           {!collapsed && (
-            <Link href="/admin" className="flex items-center gap-2.5">
+            <Link href="/admin" className="flex items-center gap-2.5" onClick={closeMobile}>
               <div className="w-2 h-2 bg-gold rotate-45" />
               <span className="text-sm tracking-[0.2em] font-light text-light">MINIMAL</span>
             </Link>
@@ -98,12 +116,9 @@ export default function AdminLayout({ children }) {
           {collapsed && (
             <div className="w-2 h-2 bg-gold rotate-45 mx-auto" />
           )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-muted hover:text-light transition-colors flex-shrink-0"
-          >
+          <button onClick={toggleSidebar} className="text-muted hover:text-light transition-colors flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d={collapsed ? "M8.25 4.5l7.5 7.5-7.5 7.5" : "M15.75 19.5 8.25 12l7.5-7.5"} />
+              <path strokeLinecap="round" strokeLinejoin="round" d={collapsed && !mobileOpen ? "M8.25 4.5l7.5 7.5-7.5 7.5" : "M15.75 19.5 8.25 12l7.5-7.5"} />
             </svg>
           </button>
         </div>
@@ -124,6 +139,7 @@ export default function AdminLayout({ children }) {
                     <Link
                       key={item.name}
                       href={item.href}
+                      onClick={closeMobile}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-200 group
                         ${isActive
                           ? 'bg-gold/10 text-gold'
@@ -164,25 +180,27 @@ export default function AdminLayout({ children }) {
       </motion.aside>
 
       {/* Main content */}
-      <main
-        className={`flex-1 transition-all duration-300 ${collapsed ? 'ml-[80px]' : 'ml-[260px]'}`}
-      >
+      <main className={`flex-1 transition-all duration-300 md:ml-[80px] ${!collapsed ? 'md:ml-[260px]' : ''}`}>
         {/* Top bar */}
-        <div className="h-16 border-b border-dark-border bg-dark-bg/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-6">
-          <div>
+        <div className="h-16 border-b border-dark-border bg-dark-bg/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger */}
+            <button onClick={toggleSidebar} className="md:hidden text-muted hover:text-light">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
             <p className="text-sm text-light font-light tracking-wide">
               {sidebarLinks.flatMap(g => g.items).find(i => i.href === pathname)?.name || 'Dashboard'}
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-xs text-muted hover:text-light tracking-widest uppercase transition-colors">
-              View Store
-            </Link>
-          </div>
+          <Link href="/" className="text-xs text-muted hover:text-light tracking-widest uppercase transition-colors">
+            View Store
+          </Link>
         </div>
 
         {/* Page content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {children}
         </div>
       </main>

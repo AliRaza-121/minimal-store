@@ -237,87 +237,79 @@ export default function AdminUsers() {
         </div>
       ) : (
         <div className="bg-dark-card border border-dark-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-dark-border">
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">User</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Role</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Status</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Last Login</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Joined</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-muted text-sm font-light">
-                      No users found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <tr key={user._id} className="border-b border-dark-border/50 hover:bg-dark-bg/50 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-dark-bg border border-dark-border flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs text-muted font-medium">
-                              {user.name?.split(' ').map(n => n[0]).join('') || '?'}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-sm text-light font-light">{user.name}</p>
-                            <p className="text-xs text-muted">{user.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${roleColors[user.role]}`}>
-                          {roleLabels[user.role]}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <button
-                          onClick={() => handleToggleStatus(user)}
-                          className="flex items-center gap-2"
-                        >
-                          <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-emerald-400' : user.status === 'deleted' ? 'bg-red-500' : 'bg-yellow-400'}`} />
-                          <span className={`text-xs font-light ${user.status === 'active' ? 'text-emerald-400' : user.status === 'deleted' ? 'text-red-400' : 'text-yellow-400'}`}>
-                            {user.status}
-                          </span>
-                        </button>
-                      </td>
-                      <td className="py-3 px-4 text-xs text-muted font-light">
-                        {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}
-                      </td>
-                      <td className="py-3 px-4 text-xs text-muted font-light">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => openEdit(user)}
-                            className="text-xs text-muted hover:text-light tracking-wide transition-colors"
-                          >
-                            Edit
-                          </button>
-                          {user.role !== 'super_admin' && (
-                            <button
-                              onClick={() => handleDelete(user)}
-                              className="text-xs text-muted hover:text-red-400 tracking-wide transition-colors"
-                            >
-                              {user.status === 'deleted' ? 'Remove' : 'Delete'}
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+         <div className="overflow-x-auto">
+  <table className="w-full text-left">
+    <thead>
+      <tr className="border-b border-dark-border">
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">User</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden sm:table-cell">Role</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden sm:table-cell">Status</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Last Login</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Joined</th>
+        <th className="py-3 px-2 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredUsers.length === 0 ? (
+        <tr>
+          <td colSpan={6} className="py-12 text-center text-muted text-sm font-light">
+            No users found
+          </td>
+        </tr>
+      ) : (
+        filteredUsers.map((user) => (
+          <tr key={user._id} className="border-b border-dark-border/50 hover:bg-dark-bg/50 transition-colors">
+            <td className="py-3 px-3 sm:px-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 rounded-full bg-dark-bg border border-dark-border flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs text-muted font-medium">
+                    {user.name?.split(' ').map(n => n[0]).join('') || '?'}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-light font-light truncate">{user.name}</p>
+                  <p className="text-[10px] text-muted sm:hidden">{roleLabels[user.role]} · {user.status}</p>
+                  <p className="text-xs text-muted hidden sm:block">{user.email}</p>
+                </div>
+              </div>
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden sm:table-cell">
+              <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${roleColors[user.role]}`}>
+                {roleLabels[user.role]}
+              </span>
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden sm:table-cell">
+              <button onClick={() => handleToggleStatus(user)} className="flex items-center gap-2">
+                <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-emerald-400' : user.status === 'deleted' ? 'bg-red-500' : 'bg-yellow-400'}`} />
+                <span className={`text-xs font-light ${user.status === 'active' ? 'text-emerald-400' : user.status === 'deleted' ? 'text-red-400' : 'text-yellow-400'}`}>
+                  {user.status}
+                </span>
+              </button>
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden lg:table-cell text-xs text-muted font-light">
+              {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden lg:table-cell text-xs text-muted font-light">
+              {new Date(user.createdAt).toLocaleDateString()}
+            </td>
+            <td className="py-3 px-2 sm:px-4">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <button onClick={() => openEdit(user)} className="text-[10px] sm:text-xs text-muted hover:text-light tracking-wide transition-colors">
+                  Edit
+                </button>
+                {user.role !== 'super_admin' && (
+                  <button onClick={() => handleDelete(user)} className="text-[10px] sm:text-xs text-muted hover:text-red-400 tracking-wide transition-colors">
+                    {user.status === 'deleted' ? 'Rem' : 'Del'}
+                  </button>
                 )}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+</div>
         </div>
       )}
 

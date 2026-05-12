@@ -226,83 +226,86 @@ if (data.success) {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-dark-border">
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Product</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Category</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Price</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Badge</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Featured</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-muted text-sm font-light">
-                      No products found
-                    </td>
-                  </tr>
-                ) : (
-                  products.map((product) => (
-                    <tr key={product._id} className="border-b border-dark-border/50 hover:bg-dark-bg/50 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-dark-bg border border-dark-border flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            {product.image ? (
-                             <img 
-  src={product.image ? product.image.replace('/upload/', '/upload/w_600,f_auto,q_auto/') : ''} 
-  alt={product.name} 
-  className="w-full h-full object-cover" 
-/>
-                            ) : (
-                              <span className="text-gold/30 text-xs">✦</span>
-                            )}
-                          </div>
-                          <span className="text-sm text-light font-light truncate max-w-[200px]">{product.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="text-xs text-muted font-light">{product.category}</span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="text-sm text-gold font-light">Rs. {product.price}</span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {product.badge ? (
-                          <span className="text-[10px] tracking-widest uppercase bg-gold/10 text-gold px-2 py-0.5 font-medium">
-                            {product.badge}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted/40">—</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        {product.featured ? (
-                          <span className="text-emerald-400 text-xs">●</span>
-                        ) : (
-                          <span className="text-muted/30 text-xs">○</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => openEdit(product)}
-                            className="text-xs text-muted hover:text-light tracking-wide transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product._id, product.name)}
-                            className="text-xs text-muted hover:text-red-400 tracking-wide transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
+  <tr className="border-b border-dark-border">
+    <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Product</th>
+    <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden sm:table-cell">Category</th>
+    <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Price</th>
+    <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Badge</th>
+    <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Featured</th>
+    <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
+  </tr>
+</thead>
+            <tbody>
+  {products.length === 0 ? (
+    <tr>
+      <td colSpan={6} className="py-12 text-center text-muted text-sm font-light">
+        No products found
+      </td>
+    </tr>
+  ) : (
+    products.map((product) => (
+      <tr key={product._id} className="border-b border-dark-border/50 hover:bg-dark-bg/50 transition-colors">
+        <td className="py-3 px-3 sm:px-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-dark-bg border border-dark-border flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {product.image ? (
+                <img 
+                  src={product.image.replace('/upload/', '/upload/w_100,f_auto,q_auto/')} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <span className="text-gold/30 text-xs">✦</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs sm:text-sm text-light font-light truncate block max-w-[120px] sm:max-w-[200px]">{product.name}</span>
+              <span className="text-[10px] text-muted sm:hidden">{product.category} · Rs. {product.price}</span>
+            </div>
+          </div>
+        </td>
+        <td className="py-3 px-3 sm:px-4 hidden sm:table-cell">
+          <span className="text-xs text-muted font-light">{product.category}</span>
+        </td>
+        <td className="py-3 px-3 sm:px-4 hidden sm:table-cell">
+          <span className="text-sm text-gold font-light">Rs. {product.price}</span>
+        </td>
+        <td className="py-3 px-3 sm:px-4 hidden lg:table-cell">
+          {product.badge ? (
+            <span className="text-[10px] tracking-widest uppercase bg-gold/10 text-gold px-2 py-0.5 font-medium">
+              {product.badge}
+            </span>
+          ) : (
+            <span className="text-xs text-muted/40">—</span>
+          )}
+        </td>
+        <td className="py-3 px-3 sm:px-4 hidden lg:table-cell">
+          {product.featured ? (
+            <span className="text-emerald-400 text-xs">●</span>
+          ) : (
+            <span className="text-muted/30 text-xs">○</span>
+          )}
+        </td>
+        <td className="py-3 px-2 sm:px-4">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button
+              onClick={() => openEdit(product)}
+              className="text-[10px] sm:text-xs text-muted hover:text-light tracking-wide transition-colors"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(product._id, product.name)}
+              className="text-[10px] sm:text-xs text-muted hover:text-red-400 tracking-wide transition-colors"
+            >
+              Del
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
             </table>
           </div>
         </div>

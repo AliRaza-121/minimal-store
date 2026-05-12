@@ -130,76 +130,78 @@ export default function AdminOrders() {
       ) : (
         <div className="bg-dark-card border border-dark-border overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-dark-border">
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Order ID</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Customer</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Items</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Total</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Status</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Date</th>
-                  <th className="py-3 px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-12 text-center text-muted text-sm font-light">
-                      No orders found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredOrders.map((order) => (
-                    <tr key={order._id} className="border-b border-dark-border/50 hover:bg-dark-bg/50 transition-colors">
-                      <td className="py-3 px-4">
-                        <span className="text-sm text-light font-light font-mono">
-                          #{order._id.slice(-8).toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <p className="text-sm text-light font-light">{order.customer?.name || 'Guest'}</p>
-                        <p className="text-xs text-muted">{order.customer?.email || 'N/A'}</p>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-muted font-light">
-                        {order.items?.length || 0} item{(order.items?.length || 0) !== 1 ? 's' : ''}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="text-sm text-gold font-light">Rs. {order.total}</span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${statusColors[order.status]}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-xs text-muted font-light">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setSelectedOrder(order)}
-                            className="text-xs text-muted hover:text-light tracking-wide transition-colors"
-                          >
-                            View
-                          </button>
-                          <select
-                            value={order.status}
-                            onChange={(e) => updateStatus(order._id, e.target.value)}
-                            className="text-xs bg-transparent border border-dark-border text-muted px-2 py-1 focus:outline-none focus:border-gold/50 cursor-pointer"
-                          >
-                            {statusSteps.map(s => (
-                              <option key={s} value={s} className="bg-dark-card text-light">{s}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+  <table className="w-full text-left">
+    <thead>
+      <tr className="border-b border-dark-border">
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Order</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden sm:table-cell">Customer</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Items</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Total</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Status</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Date</th>
+        <th className="py-3 px-2 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredOrders.length === 0 ? (
+        <tr>
+          <td colSpan={7} className="py-12 text-center text-muted text-sm font-light">
+            No orders found
+          </td>
+        </tr>
+      ) : (
+        filteredOrders.map((order) => (
+          <tr key={order._id} className="border-b border-dark-border/50 hover:bg-dark-bg/50 transition-colors">
+            <td className="py-3 px-3 sm:px-4">
+              <div>
+                <span className="text-xs sm:text-sm text-light font-light font-mono">
+                  #{order._id.slice(-6).toUpperCase()}
+                </span>
+                <span className="text-[10px] text-muted block sm:hidden">
+                  {order.customer?.name || 'Guest'}
+                </span>
+              </div>
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden sm:table-cell">
+              <p className="text-sm text-light font-light">{order.customer?.name || 'Guest'}</p>
+              <p className="text-xs text-muted">{order.customer?.email || 'N/A'}</p>
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden lg:table-cell text-sm text-muted font-light">
+              {order.items?.length || 0} item{(order.items?.length || 0) !== 1 ? 's' : ''}
+            </td>
+            <td className="py-3 px-3 sm:px-4">
+              <span className="text-sm text-gold font-light">Rs. {order.total}</span>
+            </td>
+            <td className="py-3 px-3 sm:px-4">
+              <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${statusColors[order.status]}`}>
+                {order.status}
+              </span>
+            </td>
+            <td className="py-3 px-3 sm:px-4 hidden lg:table-cell text-xs text-muted font-light">
+              {new Date(order.createdAt).toLocaleDateString()}
+            </td>
+            <td className="py-3 px-2 sm:px-4">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <button onClick={() => setSelectedOrder(order)} className="text-[10px] sm:text-xs text-muted hover:text-light tracking-wide transition-colors">
+                  View
+                </button>
+                <select
+                  value={order.status}
+                  onChange={(e) => updateStatus(order._id, e.target.value)}
+                  className="text-[10px] sm:text-xs bg-transparent border border-dark-border text-muted px-1 sm:px-2 py-1 focus:outline-none focus:border-gold/50 cursor-pointer"
+                >
+                  {statusSteps.map(s => (
+                    <option key={s} value={s} className="bg-dark-card text-light">{s}</option>
+                  ))}
+                </select>
+              </div>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+</div>
         </div>
       )}
 
@@ -294,13 +296,13 @@ export default function AdminOrders() {
                               <p className="text-xs text-muted">{item.color} / {item.size} × {item.quantity}</p>
                             </div>
                           </div>
-                          <span className="text-sm text-gold font-light">${item.price * item.quantity}</span>
+                          <span className="text-sm text-gold font-light">Rs.{item.price * item.quantity}</span>
                         </div>
                       ))}
                     </div>
                     <div className="flex justify-between pt-4 border-t border-dark-border mt-4">
                       <span className="text-sm text-light font-medium">Total</span>
-                      <span className="text-lg text-gold font-light">${selectedOrder.total}</span>
+                      <span className="text-lg text-gold font-light">Rs.{selectedOrder.total}</span>
                     </div>
                   </div>
                 </div>
