@@ -1,11 +1,11 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 
-const categories = ['All', 'Men', 'Women', 'Accessories', 'Home']
+
 const sortOptions = ['Featured', 'Price: Low to High', 'Price: High to Low', 'Newest']
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -22,6 +22,17 @@ export default function ShopClient({ products: initialProducts }) {
   const [sortBy, setSortBy] = useState('Featured')
   const [filterOpen, setFilterOpen] = useState(false)
   const [products, setProducts] = useState(initialProducts)
+  const [categoriesList, setCategoriesList] = useState(['All'])
+  useEffect(() => {
+  fetch('/api/categories')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const active = data.categories.filter(c => c.status === 'active').map(c => c.name)
+        setCategoriesList(['All', ...active])
+      }
+    })
+}, [])
 
   // Filter and sort client-side
   const getFilteredProducts = () => {
@@ -70,7 +81,7 @@ export default function ShopClient({ products: initialProducts }) {
           </button>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {categories.map((cat) => (
+            {categoriesList.map((cat) => (
               <button key={cat} onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 text-xs tracking-widest uppercase font-light transition-all duration-300 ${activeCategory === cat ? 'bg-gold text-dark-bg' : 'text-muted hover:text-light border border-dark-border hover:border-muted/30'}`}>
                 {cat}
@@ -118,7 +129,7 @@ export default function ShopClient({ products: initialProducts }) {
                     <div className="absolute inset-0">
                      {product.image ? (
   <img 
-    src={product.image.replace('/upload/', '/upload/w_500,f_auto,q_auto/')} 
+    src={product.image.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} 
     alt={product.name} 
     className="w-full h-full object-cover" 
     loading="lazy"

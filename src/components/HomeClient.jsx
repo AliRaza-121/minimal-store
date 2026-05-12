@@ -47,7 +47,7 @@ export default function HomeClient({ products }) {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
          <div className="absolute inset-0">
-          <img 
+         <img 
   src="/hero-bg.jpg" 
   srcSet="/hero-bg.jpg 1200w"
   sizes="100vw"
@@ -56,7 +56,7 @@ export default function HomeClient({ products }) {
   fetchPriority="high"
   loading="eager"
 />
-  <div className="absolute inset-0 bg-dark-bg/60" />
+  <div className="absolute inset-0 bg-dark-bg/20" />
   <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/20 to-transparent" />
 </div>
           <div className="absolute inset-0 bg-dark-bg/60" />
@@ -68,7 +68,7 @@ export default function HomeClient({ products }) {
         <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
           <motion.span variants={fadeUp} initial="hidden" animate="visible" custom={0.1}
             className="inline-block text-gold text-xs tracking-[0.4em] uppercase mb-8 font-light">
-            New Collection 2024
+            New Collection 2026
           </motion.span>
           <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={0.3}
             className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-light leading-[1.05] mb-8">
@@ -157,7 +157,7 @@ export default function HomeClient({ products }) {
                     <div className="absolute inset-0">
                     {product.image ? (
   <img 
-    src={product.image.replace('/upload/', '/upload/w_500,f_auto,q_auto/')} 
+    src={product.image.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} 
     alt={product.name} 
     className="w-full h-full object-cover" 
     loading="lazy"
@@ -215,46 +215,161 @@ export default function HomeClient({ products }) {
           </div>
         </div>
       </section>
-
       {/* NEWSLETTER */}
-      <section className="border-t border-dark-border">
-        <div className="max-w-7xl mx-auto px-6 py-24">
-          <div className="max-w-xl mx-auto text-center">
-            <motion.span initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
-              className="text-gold text-xs tracking-[0.3em] uppercase font-light">Stay in the loop</motion.span>
-            <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-light text-light mt-4 mb-4">Join our newsletter</motion.h2>
-            <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-muted text-sm font-light mb-8">Get early access to new drops, exclusive offers, and style inspiration.</motion.p>
-            <motion.form initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.3 }}
-              onSubmit={handleNewsletter} className="flex gap-3 max-w-md mx-auto">
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email address" required
-                className="flex-1 bg-dark-card border border-dark-border text-light text-sm font-light px-4 py-3 placeholder:text-muted/50 focus:outline-none focus:border-gold/50 transition-colors" />
-              <motion.button type="submit" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}
-                className="px-6 py-3 bg-gold text-dark-bg text-xs tracking-widest uppercase font-medium hover:bg-gold-light transition-colors duration-300 whitespace-nowrap">Subscribe</motion.button>
-            </motion.form>
-          </div>
-        </div>
-      </section>
+<section className="border-t border-dark-border relative overflow-hidden">
+  <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5" />
+  <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
+    <div className="max-w-xl mx-auto text-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="w-12 h-12 rounded-full bg-gold/10 mx-auto mb-6 flex items-center justify-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-5 h-5 text-gold">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+        </svg>
+      </motion.div>
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="text-3xl sm:text-4xl font-light text-light mb-3"
+      >
+        Get <span className="text-gold italic">exclusive</span> access
+      </motion.h2>
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="text-muted text-sm font-light mb-8"
+      >
+        Be the first to know about new drops, restocks, and special offers.
+      </motion.p>
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        onSubmit={handleNewsletter}
+        className="flex gap-3 max-w-md mx-auto"
+      >
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Your email address"
+          required
+          className="flex-1 bg-dark-card border border-dark-border text-light text-sm font-light px-4 py-3.5 placeholder:text-muted/50 focus:outline-none focus:border-gold/50 transition-colors"
+        />
+        <motion.button
+          type="submit"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          className="px-8 py-3.5 bg-gold text-dark-bg text-xs tracking-widest uppercase font-medium hover:bg-gold-light transition-all duration-300 whitespace-nowrap"
+        >
+          Join
+        </motion.button>
+      </motion.form>
+      <p className="text-[10px] text-muted/50 mt-4 font-light">No spam. Unsubscribe anytime.</p>
+    </div>
+  </div>
+</section>
+{/* WHY CHOOSE US */}
+<section className="border-t border-dark-border bg-dark-card">
+  <div className="max-w-7xl mx-auto px-6 py-20 sm:py-24">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="text-center mb-14"
+    >
+      <span className="text-gold text-xs tracking-[0.3em] uppercase font-light">Why MINIMAL</span>
+      <h2 className="text-2xl sm:text-3xl font-light text-light mt-3">
+        Designed for the <span className="text-gold italic">modern you</span>
+      </h2>
+    </motion.div>
 
-      {/* QUOTE */}
-      <section className="border-t border-dark-border">
-        <div className="max-w-7xl mx-auto px-6 py-24 sm:py-32">
-          <motion.blockquote initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-8 h-8 text-gold/30 mx-auto mb-8">
-              <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[
+        {
+          icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
             </svg>
-            <p className="text-xl sm:text-2xl lg:text-3xl font-light text-light leading-relaxed italic">
-              &ldquo;Simplicity is the ultimate sophistication. Every piece we curate reflects a commitment to timeless design and uncompromising quality.&rdquo;
-            </p>
-            <footer className="mt-8">
-              <p className="text-gold text-sm tracking-widest uppercase font-light">— Elena Marchetti</p>
-              <p className="text-muted text-xs font-light mt-1">Founder & Creative Director</p>
-            </footer>
-          </motion.blockquote>
-        </div>
-      </section>
+          ),
+          title: 'Premium Quality',
+          desc: 'Every piece is handpicked and crafted from the finest materials, ensuring durability and elegance.',
+        },
+        {
+          icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+          ),
+          title: 'Fast Delivery',
+          desc: 'Orders ship within 24 hours. Free delivery on all orders above Rs. 150.',
+        },
+        {
+          icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          ),
+          title: 'Easy Returns',
+          desc: 'Not satisfied? Return within 30 days for a full refund. No questions asked.',
+        },
+        {
+          icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+          ),
+          title: 'Secure Checkout',
+          desc: '256-bit SSL encryption protects your data. Shop with complete confidence.',
+        },
+        {
+          icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+            </svg>
+          ),
+          title: '24/7 Support',
+          desc: 'Need help? Our team is available anytime via chat, email, or phone.',
+        },
+        {
+          icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          ),
+          title: 'Made with Love',
+          desc: 'Built by a solo developer who cares deeply about every pixel and every line of code.',
+        },
+      ].map((item, i) => (
+        <motion.div
+          key={item.title}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.08 }}
+          whileHover={{ y: -4, borderColor: 'rgba(201,168,76,0.3)' }}
+          className="bg-dark-bg border border-dark-border p-6 group transition-all duration-300"
+        >
+          <div className="text-gold mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">
+            {item.icon}
+          </div>
+          <h3 className="text-sm text-light tracking-wide font-medium mb-2">{item.title}</h3>
+          <p className="text-xs text-muted font-light leading-relaxed">{item.desc}</p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
     </>
   )
 }

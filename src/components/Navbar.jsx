@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
 
@@ -18,12 +17,9 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hoveredLink, setHoveredLink] = useState(null)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [navSearch, setNavSearch] = useState('')
 
   const { cartCount, setIsOpen } = useCart()
   const { user, logout } = useAuth()
-  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -39,14 +35,6 @@ export default function Navbar() {
     }
     return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
-
-  const handleSearch = (e) => {
-    if (e.key === 'Enter' && navSearch.trim()) {
-      router.push(`/shop?search=${encodeURIComponent(navSearch.trim())}`)
-      setSearchOpen(false)
-      setNavSearch('')
-    }
-  }
 
   return (
     <>
@@ -104,43 +92,6 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-6">
-            {/* Search */}
-            {searchOpen ? (
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search and press enter..."
-                  value={navSearch}
-                  onChange={(e) => setNavSearch(e.target.value)}
-                  onKeyDown={handleSearch}
-                  autoFocus
-                  onBlur={() => { 
-                    if (!navSearch) { setSearchOpen(false); setNavSearch('') }
-                  }}
-                  className="bg-dark-card border border-dark-border text-light text-sm font-light px-3 py-2 pr-8 focus:outline-none focus:border-gold/50 transition-colors w-[220px]"
-                />
-                <button
-                  onClick={() => { setSearchOpen(false); setNavSearch('') }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-light"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSearchOpen(true)}
-                className="text-muted hover:text-light transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-              </motion.button>
-            )}
-
             {/* Cart */}
             <motion.button
               whileHover={{ scale: 1.1 }}
