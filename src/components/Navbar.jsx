@@ -25,7 +25,10 @@ export default function Navbar() {
 
   const { scrollY } = useScroll()
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > 20)
+    setScrolled(prev => {
+      const isScrolled = latest > 20
+      return prev !== isScrolled ? isScrolled : prev
+    })
   })
   useEffect(() => {
     if (mobileOpen) {
@@ -42,9 +45,9 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 transform-gpu will-change-transform
           ${scrolled
-            ? 'bg-dark-bg/85 backdrop-blur-xl shadow-2xl shadow-black/20'
+            ? 'bg-dark-bg/95 backdrop-blur-sm shadow-2xl shadow-black/20'
             : 'bg-transparent'
           }`}
       >

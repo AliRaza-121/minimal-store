@@ -28,7 +28,7 @@ function ParallaxLookbook({ lookbook }) {
 
   return (
     <section ref={parallaxRef} style={{ position: 'relative' }} className="relative py-12 sm:py-20 bg-dark-bg overflow-hidden border-b border-dark-border">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[150px] -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[150px] -z-10 transform-gpu will-change-transform" />
 
       <div className="text-center mb-12 sm:mb-16 relative z-20">
         <span className="text-gold text-xs tracking-[0.3em] uppercase font-light">The Lookbook</span>
@@ -37,7 +37,7 @@ function ParallaxLookbook({ lookbook }) {
       </div>
       <div className="relative max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 h-auto">
         
-        <motion.div style={{ y: y1 }} className="flex flex-col gap-6 sm:gap-10 pt-0">
+        <motion.div style={{ y: y1 }} className="flex flex-col gap-6 sm:gap-10 pt-0 transform-gpu will-change-transform">
           {lookbook[0] && (
             <Link href={lookbook[0].link || '/shop'} className="relative aspect-[3/4] w-full overflow-hidden group block border border-dark-border">
               <Image src={lookbook[0].image.replace('/upload/', '/upload/w_600,f_auto,q_auto/')} alt={lookbook[0].title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
@@ -57,7 +57,7 @@ function ParallaxLookbook({ lookbook }) {
           )}
         </motion.div>
 
-        <motion.div style={{ y: y2 }} className="flex flex-col gap-6 sm:gap-10 -mt-0 md:-mt-20 z-10">
+        <motion.div style={{ y: y2 }} className="flex flex-col gap-6 sm:gap-10 -mt-0 md:-mt-20 z-10 transform-gpu will-change-transform">
           <div className="p-8 text-center border border-dark-border flex items-center justify-center aspect-square bg-dark-bg/80 backdrop-blur-md">
              <span className="text-light text-xl sm:text-2xl font-light italic leading-relaxed">"Simplicity is the ultimate sophistication."</span>
           </div>
@@ -71,7 +71,7 @@ function ParallaxLookbook({ lookbook }) {
           )}
         </motion.div>
 
-        <motion.div style={{ y: y3 }} className="flex flex-col gap-6 sm:gap-10 pt-20 md:pt-32">
+        <motion.div style={{ y: y3 }} className="flex flex-col gap-6 sm:gap-10 pt-20 md:pt-32 transform-gpu will-change-transform">
           {lookbook[2] && (
             <Link href={lookbook[2].link || '/shop'} className="relative aspect-square w-full overflow-hidden group block border border-dark-border">
               <Image src={lookbook[2].image.replace('/upload/', '/upload/w_600,f_auto,q_auto/')} alt={lookbook[2].title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
