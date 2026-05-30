@@ -3,6 +3,7 @@ import { CartProvider } from '@/context/CartContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { FavoritesProvider } from '@/context/FavoritesContext'
 import CartDrawer from '@/components/CartDrawer'
+import SmoothScroll from '@/components/SmoothScroll'
 import './globals.css'
 import { ToastProvider } from '@/context/ToastContext'
 
@@ -46,8 +47,10 @@ export default function RootLayout({ children }) {
           <ToastProvider>
             <FavoritesProvider>
               <CartProvider>
-                {children}
-                <CartDrawer />
+                <SmoothScroll>
+                  {children}
+                  <CartDrawer />
+                </SmoothScroll>
               </CartProvider>
             </FavoritesProvider>
           </ToastProvider>
