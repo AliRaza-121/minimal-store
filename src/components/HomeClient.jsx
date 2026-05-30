@@ -199,8 +199,8 @@ export default function HomeClient({ products, lookbook = [], trending = [] }) {
           <div className="absolute inset-0 bg-dark-bg/50" />
           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/50 to-transparent" />
         </div>
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-gold/5 blur-[150px]" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full bg-dark-bg/80 blur-[80px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-gold/5 blur-[150px] transform-gpu will-change-transform" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full bg-dark-bg/80 blur-[80px] transform-gpu will-change-transform" />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
           <motion.span variants={fadeUp} initial="hidden" animate="visible" custom={0.1}
