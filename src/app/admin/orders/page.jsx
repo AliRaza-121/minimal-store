@@ -138,6 +138,7 @@ export default function AdminOrders() {
         <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Items</th>
         <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Total</th>
         <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Status</th>
+        <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Payment</th>
         <th className="py-3 px-3 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium hidden lg:table-cell">Date</th>
         <th className="py-3 px-2 sm:px-4 text-[10px] text-muted tracking-widest uppercase font-medium">Actions</th>
       </tr>
@@ -175,6 +176,11 @@ export default function AdminOrders() {
             <td className="py-3 px-3 sm:px-4">
               <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${statusColors[order.status]}`}>
                 {order.status}
+              </span>
+            </td>
+            <td className="py-3 px-3 sm:px-4">
+              <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${order.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'}`}>
+                {order.paymentStatus || 'pending'}
               </span>
             </td>
             <td className="py-3 px-3 sm:px-4 hidden lg:table-cell text-xs text-muted font-light">
@@ -268,6 +274,22 @@ export default function AdminOrders() {
                           {step}
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Payment */}
+                  <div className="pt-4 border-t border-dark-border mt-4">
+                    <p className="text-[10px] text-muted tracking-widest uppercase mb-3">Payment Info</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-light font-light uppercase tracking-wider">
+                        {selectedOrder.paymentMethod === 'cod' ? 'Cash on Delivery' : 
+                         selectedOrder.paymentMethod === 'card' ? 'Card' :
+                         selectedOrder.paymentMethod === 'bank_transfer' ? 'Bank Transfer' :
+                         selectedOrder.paymentMethod || 'cod'}
+                      </span>
+                      <span className={`text-[10px] tracking-widest uppercase px-2 py-0.5 border font-medium ${selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'}`}>
+                        {selectedOrder.paymentStatus || 'pending'}
+                      </span>
                     </div>
                   </div>
 

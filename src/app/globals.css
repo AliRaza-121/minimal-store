@@ -17,3 +17,48 @@ body {
   color: var(--color-light);
   font-family: var(--font-sans);
 }
+
+/* Fix browser autofill styling overriding dark mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 50px var(--color-dark-bg) inset !important;
+  -webkit-text-fill-color: var(--color-light) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Custom Scrollbar for Dark Mode */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* Global Cursor Pointer Fix for interactive elements */
+button, 
+[role="button"],
+select,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+label.cursor-pointer {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+}

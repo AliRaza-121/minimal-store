@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
+import FavoriteButton from '@/components/FavoriteButton'
+import { useCart } from '@/context/CartContext'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -13,11 +16,150 @@ const fadeUp = {
   }),
 }
 
-export default function HomeClient({ products }) {
+function ParallaxLookbook({ lookbook }) {
+  const parallaxRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: parallaxRef,
+    offset: ["start end", "end start"]
+  })
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -80])
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, 80])
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, -120])
+
+  return (
+    <section ref={parallaxRef} style={{ position: 'relative' }} className="relative py-12 sm:py-20 bg-dark-bg overflow-hidden border-b border-dark-border">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[150px] -z-10" />
+
+      <div className="text-center mb-12 sm:mb-16 relative z-20">
+        <span className="text-gold text-xs tracking-[0.3em] uppercase font-light">The Lookbook</span>
+        <h2 className="text-4xl sm:text-5xl lg:text-7xl font-light text-light mt-4">Art of Layering</h2>
+        <div className="w-12 h-[1px] bg-gold/40 mx-auto mt-6" />
+      </div>
+      <div className="relative max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 h-auto">
+        
+        <motion.div style={{ y: y1 }} className="flex flex-col gap-6 sm:gap-10 pt-0">
+          {lookbook[0] && (
+            <Link href={lookbook[0].link || '/shop'} className="relative aspect-[3/4] w-full overflow-hidden group block border border-dark-border">
+              <Image src={lookbook[0].image.replace('/upload/', '/upload/w_600,f_auto,q_auto/')} alt={lookbook[0].title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              <div className="absolute inset-0 bg-dark-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-light text-xs tracking-widest uppercase border-b border-gold pb-1">Shop Collection</span>
+              </div>
+            </Link>
+          )}
+          {lookbook[0] && (
+            <div className="p-6 bg-dark-card border border-dark-border">
+              <p className="text-gold text-[10px] tracking-widest uppercase mb-2">Editorial</p>
+              <h3 className="text-light text-xl font-light mb-4">{lookbook[0].title}</h3>
+              {lookbook[0].subtitle && (
+                <p className="text-muted text-sm font-light leading-relaxed">{lookbook[0].subtitle}</p>
+              )}
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div style={{ y: y2 }} className="flex flex-col gap-6 sm:gap-10 -mt-0 md:-mt-20 z-10">
+          <div className="p-8 text-center border border-dark-border flex items-center justify-center aspect-square bg-dark-bg/80 backdrop-blur-md">
+             <span className="text-light text-xl sm:text-2xl font-light italic leading-relaxed">"Simplicity is the ultimate sophistication."</span>
+          </div>
+          {lookbook[1] && (
+            <Link href={lookbook[1].link || '/shop'} className="relative aspect-[4/5] w-full overflow-hidden group block border border-dark-border">
+              <Image src={lookbook[1].image.replace('/upload/', '/upload/w_600,f_auto,q_auto/')} alt={lookbook[1].title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              <div className="absolute inset-0 bg-dark-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-light text-xs tracking-widest uppercase border-b border-gold pb-1">Shop Collection</span>
+              </div>
+            </Link>
+          )}
+        </motion.div>
+
+        <motion.div style={{ y: y3 }} className="flex flex-col gap-6 sm:gap-10 pt-20 md:pt-32">
+          {lookbook[2] && (
+            <Link href={lookbook[2].link || '/shop'} className="relative aspect-square w-full overflow-hidden group block border border-dark-border">
+              <Image src={lookbook[2].image.replace('/upload/', '/upload/w_600,f_auto,q_auto/')} alt={lookbook[2].title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              <div className="absolute inset-0 bg-dark-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-light text-xs tracking-widest uppercase border-b border-gold pb-1">Shop Collection</span>
+              </div>
+            </Link>
+          )}
+          <div className="text-right pr-4">
+            <Link href="/shop" className="text-sm text-gold hover:text-light tracking-widest uppercase transition-colors inline-flex items-center gap-2">
+              Explore The Edit <span>→</span>
+            </Link>
+          </div>
+        </motion.div>
+
+      </div>
+    </section>
+  )
+}
+
+export default function HomeClient({ products, lookbook = [], trending = [] }) {
   const [activeCategory, setActiveCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [email, setEmail] = useState('')
   const [categoriesList, setCategoriesList] = useState(['All'])
+  
+  const { addToCart } = useCart()
+
+  const carouselRef = useRef(null)
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  // Occasions State
+  const occasionScrollRef = useRef(null)
+  const [activeOccasion, setActiveOccasion] = useState(0)
+  
+  const occasions = [
+    { id: 1, title: 'DINNER', image: products.length > 0 ? products[0].image : '' },
+    { id: 2, title: 'BRIDAL', image: products.length > 1 ? products[1].image : '' },
+    { id: 3, title: 'CASUAL', image: products.length > 2 ? products[2].image : '' },
+    { id: 4, title: 'FORMAL', image: products.length > 3 ? products[3].image : '' }
+  ]
+
+  // Auto-play for Occasions Slider
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (occasionScrollRef.current && occasions.length > 0) {
+        const nextIndex = (activeOccasion + 1) % occasions.length;
+        // Scroll to the next slide. Using 85% width for cards means we have to calculate the scroll position.
+        // Wait, the items are 85% width. So the scroll amount is item width. 
+        // We can just use the scrollWidth and divide by length.
+        const scrollAmount = occasionScrollRef.current.scrollWidth / occasions.length;
+        occasionScrollRef.current.scrollTo({
+          left: nextIndex * scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [activeOccasion, occasions.length]);
+
+  const handleOccasionScroll = (e) => {
+    if (!e.target) return
+    const scrollLeft = e.target.scrollLeft
+    const scrollAmount = e.target.scrollWidth / occasions.length
+    const newIndex = Math.round(scrollLeft / scrollAmount)
+    if (newIndex !== activeOccasion && newIndex >= 0 && newIndex < occasions.length) {
+      setActiveOccasion(newIndex)
+    }
+  }
+
+  const handleScroll = () => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current
+      if (scrollWidth > clientWidth) {
+        const progress = scrollLeft / (scrollWidth - clientWidth)
+        setScrollProgress(progress * 100)
+      } else {
+        setScrollProgress(0)
+      }
+    }
+  }
+
+  const scrollCarousel = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = carouselRef.current.clientWidth * 0.8
+      carouselRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
+    }
+  }
 
   useEffect(() => {
     fetch('/api/categories')
@@ -46,21 +188,13 @@ export default function HomeClient({ products }) {
       {/* HERO */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-         <div className="absolute inset-0">
-         <img 
-  src="/hero-bg.jpg" 
-  srcSet="/hero-bg.jpg 1200w"
-  sizes="100vw"
-  alt="Hero background" 
-  className="w-full h-full object-cover"
-  fetchPriority="high"
-  loading="eager"
-/>
-  <div className="absolute inset-0 bg-dark-bg/20" />
-  <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/20 to-transparent" />
-</div>
-          <div className="absolute inset-0 bg-dark-bg/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/20 to-transparent" />
+          <img 
+            src="/hero-bg.jpg" 
+            alt="Hero background" 
+            className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
+          />
+          <div className="absolute inset-0 bg-dark-bg/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/50 to-transparent" />
         </div>
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-gold/5 blur-[150px]" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full bg-dark-bg/80 blur-[80px]" />
@@ -138,238 +272,329 @@ export default function HomeClient({ products }) {
       </motion.section>
 
       {/* FEATURED PRODUCTS */}
-      <section className="py-24 sm:py-32 px-6 max-w-7xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }} transition={{ duration: 0.7 }}
-          className="text-center mb-16 sm:mb-20">
-          <span className="text-gold text-xs tracking-[0.3em] uppercase font-light">Handpicked for you</span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-light mt-4">Featured Pieces</h2>
-          <div className="w-12 h-[1px] bg-gold/40 mx-auto mt-6" />
-        </motion.div>
-
+      {/* HANDPICKED SPLIT LAYOUT CAROUSEL */}
+      <section className="w-full bg-dark-bg overflow-hidden">
         {filteredProducts.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {filteredProducts.map((product, i) => (
-              <motion.div key={product._id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }} transition={{ duration: 0.6, delay: i * 0.1 }}>
-                <Link href={`/shop/${product._id}`} className="group block">
-                  <div className="relative aspect-[3/4] bg-dark-card border border-dark-border overflow-hidden mb-4">
-                    <div className="absolute inset-0">
-                    {product.image ? (
-  <img 
-    src={product.image.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} 
-    alt={product.name} 
-    className="w-full h-full object-cover" 
-    loading="lazy"
-  />
-) : (
-  <div className="w-full h-full flex items-center justify-center">
-    <span className="text-gold/30 text-2xl">✦</span>
-  </div>
-)}
-                    </div>
-                    {product.badge && (
-                      <span className="absolute top-3 left-3 bg-gold text-dark-bg text-[10px] tracking-widest uppercase px-2.5 py-1 font-medium">{product.badge}</span>
-                    )}
-                    <div className="absolute inset-0 bg-dark-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <span className="text-light text-xs tracking-widest uppercase border-b border-gold pb-1">View Details</span>
-                    </div>
+          <div className="flex flex-col lg:flex-row w-full h-auto lg:h-[550px]">
+            {/* Left Hero Image (Using first product) */}
+            <motion.div 
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
+              className="w-full lg:w-[40%] h-[300px] lg:h-full relative shrink-0"
+            >
+              {filteredProducts[0].image ? (
+                <Image 
+                  src={filteredProducts[0].image.replace('/upload/', '/upload/w_1200,f_auto,q_auto/')} 
+                  alt={filteredProducts[0].name} 
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  priority
+                  className="object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full bg-dark-card flex items-center justify-center">
+                  <span className="text-gold/30 text-4xl">✦</span>
+                </div>
+              )}
+              {/* Overlay for aesthetics */}
+              <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-dark-bg/80 pointer-events-none" />
+            </motion.div>
+
+            {/* Right Carousel Area */}
+            <div className="w-full lg:w-[60%] flex flex-col justify-between py-8 px-6 lg:py-10 lg:px-10 bg-dark-card/30">
+              
+              {/* Header & Controls */}
+              <div className="flex justify-between items-end mb-6 lg:mb-8">
+                <div>
+                  <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-light block mb-2">Handpicked for you</span>
+                  <h2 className="text-3xl lg:text-4xl font-light text-light tracking-wide uppercase">
+                    {activeCategory === 'All' ? 'Featured' : activeCategory}
+                  </h2>
+                </div>
+                
+                <div className="flex items-center gap-6">
+                  <Link href="/shop" className="hidden sm:inline-block text-[11px] text-light/80 hover:text-gold tracking-widest uppercase font-light border-b border-gold/30 pb-0.5 transition-colors">
+                    View all
+                  </Link>
+                  <div className="flex gap-2">
+                    <button onClick={() => scrollCarousel('left')} className="w-10 h-10 border border-dark-border flex items-center justify-center text-light hover:text-gold hover:border-gold/50 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                    </button>
+                    <button onClick={() => scrollCarousel('right')} className="w-10 h-10 border border-dark-border flex items-center justify-center text-light hover:text-gold hover:border-gold/50 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+                    </button>
                   </div>
-                  <p className="text-sm text-light font-light tracking-wide">{product.name}</p>
-                  <p className="text-sm text-gold font-light mt-1">Rs. {product.price}</p>
-                </Link>
-              </motion.div>
-            ))}
+                </div>
+              </div>
+
+              {/* Scrolling Container */}
+              <div 
+                ref={carouselRef}
+                onScroll={handleScroll}
+                className="flex overflow-x-auto gap-4 lg:gap-6 snap-x snap-mandatory hide-scrollbar pb-4 pt-2 flex-grow items-start"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {filteredProducts.map((product, i) => (
+                  <motion.div 
+                    key={product._id} 
+                    initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+                    className="w-[200px] lg:w-[240px] snap-start shrink-0 group block cursor-pointer"
+                  >
+                    <Link href={`/shop/${product._id}`} className="flex flex-col h-full w-full">
+                      <div className="relative w-full aspect-[3/4] bg-dark-bg rounded-xl overflow-hidden mb-4 border border-dark-border group-hover:border-gold/30 transition-colors shrink-0">
+                        {product.image ? (
+                          <Image 
+                            src={product.image.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} 
+                            alt={product.name} 
+                            fill
+                            sizes="280px"
+                            className="object-cover transition-transform duration-700 group-hover:scale-105" 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"><span className="text-gold/30 text-2xl">✦</span></div>
+                        )}
+                        <div className="absolute top-3 right-3 z-10"><FavoriteButton product={product} /></div>
+                        {product.badge && (
+                          <div className="absolute top-4 left-4 bg-gold text-dark-bg text-[10px] leading-none tracking-widest uppercase px-3 py-1.5 font-semibold z-[5] rounded-sm shadow-sm">
+                            {product.badge}
+                          </div>
+                        )}
+
+                        {/* Hover Quick Add Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-dark-bg/95 backdrop-blur-md p-3 sm:p-4 border-t border-dark-border flex flex-col gap-2 z-20">
+                          {product.sizes && product.sizes.length > 0 && (
+                            <div className="flex justify-center gap-1.5 flex-wrap mb-1">
+                              {(Array.isArray(product.sizes) ? product.sizes : product.sizes.split(',')).map((size, sIdx) => {
+                                const sizeStr = typeof size === 'string' ? size.trim() : size
+                                return (
+                                  <button 
+                                    key={sIdx}
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      const defColor = Array.isArray(product.colors) ? product.colors[0] : (product.colors ? product.colors.split(',')[0].trim() : null)
+                                      addToCart(product, defColor, sizeStr)
+                                    }}
+                                    className="text-[10px] text-light border border-dark-border hover:border-gold hover:text-gold px-2 py-1 rounded-sm transition-colors cursor-pointer"
+                                  >
+                                    {sizeStr}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              const defSize = Array.isArray(product.sizes) ? product.sizes[0] : (product.sizes ? product.sizes.split(',')[0].trim() : null)
+                              const defColor = Array.isArray(product.colors) ? product.colors[0] : (product.colors ? product.colors.split(',')[0].trim() : null)
+                              addToCart(product, defColor, defSize)
+                            }}
+                            className="w-full bg-gold hover:bg-light text-dark-bg text-[10px] tracking-widest uppercase py-2 font-medium transition-colors rounded-sm cursor-pointer"
+                          >
+                            Add to Cart
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted tracking-widest uppercase font-light mb-1">{product.category}</p>
+                      <p className="text-sm text-light font-medium tracking-wide line-clamp-1 group-hover:text-gold transition-colors">{product.name}</p>
+                      <p className="text-sm text-gold font-light mt-1">Rs. {product.price?.toLocaleString()}</p>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full h-[2px] bg-dark-border mt-4 lg:mt-8 relative overflow-hidden">
+                <motion.div 
+                  className="absolute top-0 left-0 h-full bg-gold"
+                  style={{ width: `${scrollProgress}%`, minWidth: '10%' }}
+                  transition={{ ease: "easeOut" }}
+                />
+              </div>
+
+            </div>
           </div>
         ) : (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+          <div className="py-20 text-center">
             <p className="text-muted text-lg font-light">No pieces found.</p>
-            <button onClick={() => { setActiveCategory('All'); setSearchTerm('') }}
-              className="text-gold text-sm tracking-widest uppercase mt-4 hover:text-gold-light transition-colors">Clear filters</button>
-          </motion.div>
+            <button onClick={() => { setActiveCategory('All'); setSearchTerm('') }} className="text-gold text-sm tracking-widest uppercase mt-4 hover:text-gold-light transition-colors">Clear filters</button>
+          </div>
         )}
-
-        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4 }}
-          className="text-center mt-14">
-          <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-muted hover:text-gold tracking-widest uppercase font-light transition-colors duration-300">
-            View All Products <span className="text-gold">→</span>
-          </Link>
-        </motion.div>
       </section>
 
-      {/* BRAND PROMISE BAR */}
-      <section className="border-t border-dark-border bg-dark-card">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid sm:grid-cols-3 gap-10 text-center">
-            {[
-              { icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8 mx-auto"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>), title: 'Free Shipping', desc: 'Complimentary delivery on all orders over Rs. 150.' },
-              { icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8 mx-auto"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>), title: 'Secure Checkout', desc: '256-bit SSL encryption. Your data is always protected.' },
-              { icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8 mx-auto"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>), title: 'Easy Returns', desc: '30-day hassle-free returns. No questions asked.' },
-            ].map((item) => (
-              <motion.div key={item.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
-                <div className="text-gold mb-5 flex justify-center">{item.icon}</div>
-                <h3 className="text-sm text-light tracking-widest uppercase font-light mb-3">{item.title}</h3>
-                <p className="text-xs text-muted font-light leading-relaxed max-w-xs mx-auto">{item.desc}</p>
-              </motion.div>
+      {/* SHOP BY OCCASION SPLIT SECTION */}
+      <section className="w-full bg-dark-bg border-b border-dark-border overflow-hidden mb-0">
+        <div className="flex flex-col lg:flex-row w-full h-auto lg:h-[450px]">
+          {/* Left Side: Text and Controls */}
+          <div className="w-full lg:w-[40%] flex flex-col justify-center py-12 px-8 lg:px-12 bg-dark-bg relative shrink-0">
+            <span className="text-[10px] font-bold tracking-widest uppercase mb-4 text-gold">Eid Collection '26</span>
+            <h2 className="text-4xl lg:text-5xl font-light mb-6 tracking-wide text-light">Shop By Occasion</h2>
+            <p className="text-xs lg:text-sm font-light text-muted mb-8 leading-relaxed max-w-sm">
+              Celebrate in effortless elegance. Timeless designs made for moments that matter.
+            </p>
+            <Link href="/shop" className="inline-flex items-center gap-2 border border-dark-border hover:border-gold px-5 py-2.5 w-fit text-[10px] lg:text-xs font-medium uppercase tracking-widest transition-colors text-light">
+              Shop The Look <span className="text-lg leading-none">→</span>
+            </Link>
+            
+            {/* Dashes/Dots Navigation */}
+            <div className="mt-8 lg:mt-12 flex gap-3">
+              {occasions.map((_, i) => (
+                <button 
+                  key={i}
+                  onClick={() => {
+                    if(occasionScrollRef.current) {
+                      const scrollAmount = occasionScrollRef.current.scrollWidth / occasions.length;
+                      occasionScrollRef.current.scrollTo({
+                        left: i * scrollAmount,
+                        behavior: 'smooth'
+                      })
+                    }
+                  }}
+                  className={`h-0.5 transition-all duration-300 ${activeOccasion === i ? 'w-12 bg-gold' : 'w-8 bg-dark-border hover:bg-gold/50'}`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Right Side: Snap Slider */}
+          <div 
+            ref={occasionScrollRef}
+            onScroll={handleOccasionScroll}
+            className="w-full lg:w-[60%] h-[400px] lg:h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar relative shrink-0"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {occasions.map((occ, i) => (
+              <div key={occ.id} className="w-full lg:w-[85%] h-full shrink-0 snap-start relative border-l border-dark-border group cursor-pointer overflow-hidden">
+                <Image 
+                  src={occ.image?.replace('/upload/', '/upload/w_1200,f_auto,q_auto/') || '/placeholder.jpg'} 
+                  alt={occ.title} 
+                  fill 
+                  className="object-cover transition-transform duration-1000 group-hover:scale-105" 
+                />
+                <div className="absolute inset-0 bg-dark-bg/20 group-hover:bg-dark-bg/10 transition-colors duration-500" />
+                {/* Large Centered Overlay Text */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <h3 className="text-light text-5xl md:text-7xl lg:text-8xl font-black tracking-[0.2em] uppercase opacity-90 drop-shadow-2xl">{occ.title}</h3>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
-      {/* NEWSLETTER */}
-<section className="border-t border-dark-border relative overflow-hidden">
-  <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5" />
-  <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
-    <div className="max-w-xl mx-auto text-center">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="w-12 h-12 rounded-full bg-gold/10 mx-auto mb-6 flex items-center justify-center"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-5 h-5 text-gold">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-        </svg>
-      </motion.div>
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="text-3xl sm:text-4xl font-light text-light mb-3"
-      >
-        Get <span className="text-gold italic">exclusive</span> access
-      </motion.h2>
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-muted text-sm font-light mb-8"
-      >
-        Be the first to know about new drops, restocks, and special offers.
-      </motion.p>
-      <motion.form
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        onSubmit={handleNewsletter}
-        className="flex gap-3 max-w-md mx-auto"
-      >
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your email address"
-          required
-          className="flex-1 bg-dark-card border border-dark-border text-light text-sm font-light px-4 py-3.5 placeholder:text-muted/50 focus:outline-none focus:border-gold/50 transition-colors"
-        />
-        <motion.button
-          type="submit"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          className="px-8 py-3.5 bg-gold text-dark-bg text-xs tracking-widest uppercase font-medium hover:bg-gold-light transition-all duration-300 whitespace-nowrap"
-        >
-          Join
-        </motion.button>
-      </motion.form>
-      <p className="text-[10px] text-muted/50 mt-4 font-light">No spam. Unsubscribe anytime.</p>
-    </div>
-  </div>
-</section>
-{/* WHY CHOOSE US */}
-<section className="border-t border-dark-border bg-dark-card">
-  <div className="max-w-7xl mx-auto px-6 py-20 sm:py-24">
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="text-center mb-14"
-    >
-      <span className="text-gold text-xs tracking-[0.3em] uppercase font-light">Why MINIMAL</span>
-      <h2 className="text-2xl sm:text-3xl font-light text-light mt-3">
-        Designed for the <span className="text-gold italic">modern you</span>
-      </h2>
-    </motion.div>
-
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[
-        {
-          icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
-            </svg>
-          ),
-          title: 'Premium Quality',
-          desc: 'Every piece is handpicked and crafted from the finest materials, ensuring durability and elegance.',
-        },
-        {
-          icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-            </svg>
-          ),
-          title: 'Fast Delivery',
-          desc: 'Orders ship within 24 hours. Free delivery on all orders above Rs. 150.',
-        },
-        {
-          icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-          ),
-          title: 'Easy Returns',
-          desc: 'Not satisfied? Return within 30 days for a full refund. No questions asked.',
-        },
-        {
-          icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-            </svg>
-          ),
-          title: 'Secure Checkout',
-          desc: '256-bit SSL encryption protects your data. Shop with complete confidence.',
-        },
-        {
-          icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-            </svg>
-          ),
-          title: '24/7 Support',
-          desc: 'Need help? Our team is available anytime via chat, email, or phone.',
-        },
-        {
-          icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-            </svg>
-          ),
-          title: 'Made with Love',
-          desc: 'Built by a solo developer who cares deeply about every pixel and every line of code.',
-        },
-      ].map((item, i) => (
-        <motion.div
-          key={item.title}
-          initial={{ opacity: 0, y: 20 }}
+      {/* TRENDING - THIS WEEKS TOP 5 */}
+      {trending.length > 0 && (
+        <motion.section 
+          initial={{ opacity: 0, y: 30 }} 
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: i * 0.08 }}
-          whileHover={{ y: -4, borderColor: 'rgba(201,168,76,0.3)' }}
-          className="bg-dark-bg border border-dark-border p-6 group transition-all duration-300"
+          viewport={{ once: true }} 
+          transition={{ duration: 0.7 }}
+          className="py-12 sm:py-20 px-6 border-b border-dark-border"
         >
-          <div className="text-gold mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">
-            {item.icon}
-          </div>
-          <h3 className="text-sm text-light tracking-wide font-medium mb-2">{item.title}</h3>
-          <p className="text-xs text-muted font-light leading-relaxed">{item.desc}</p>
-        </motion.div>
-      ))}
-    </div>
-  </div>
-</section>
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-10 sm:mb-14">
+              <span className="text-gold text-xs tracking-[0.3em] uppercase font-light">Trending</span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-light mt-4">This Week&apos;s Top 5</h2>
+              <div className="w-12 h-[1px] bg-gold/40 mx-auto mt-6" />
+            </div>
 
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+              {trending.map((product, i) => (
+                <motion.div 
+                  key={product._id} 
+                  initial={{ opacity: 0, y: 40 }} 
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-50px' }} 
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                >
+                  <Link href={`/shop/${product._id}`} className="group block">
+                    <div className="relative aspect-[3/4] bg-dark-card border border-dark-border overflow-hidden mb-4">
+                      {/* Primary Image */}
+                      <div className="absolute inset-0">
+                        {product.image ? (
+                          <Image 
+                            src={product.image.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} 
+                            alt={product.name} 
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                            priority={i < 4}
+                            className={`object-cover transition-opacity duration-500 ${product.hoverImage ? 'group-hover:opacity-0' : ''}`}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-gold/30 text-2xl">✦</span>
+                          </div>
+                        )}
+                      </div>
+                      {/* Hover Image */}
+                      {product.hoverImage && (
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                          <Image 
+                            src={product.hoverImage.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} 
+                            alt={`${product.name} - alternate`} 
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+                      <FavoriteButton product={product} />
+                      {product.badge && (
+                        <span className="absolute top-3 left-3 bg-gold text-dark-bg text-[10px] tracking-widest uppercase px-2.5 py-1 font-medium z-[5]">{product.badge}</span>
+                      )}
+
+                      {/* Hover Quick Add Overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-dark-bg/95 backdrop-blur-md p-3 sm:p-4 border-t border-dark-border flex flex-col gap-2 z-20">
+                        {product.sizes && product.sizes.length > 0 && (
+                          <div className="flex justify-center gap-1.5 flex-wrap mb-1">
+                            {(Array.isArray(product.sizes) ? product.sizes : product.sizes.split(',')).map((size, sIdx) => {
+                              const sizeStr = typeof size === 'string' ? size.trim() : size
+                              return (
+                                <button 
+                                  key={sIdx}
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    const defColor = Array.isArray(product.colors) ? product.colors[0] : (product.colors ? product.colors.split(',')[0].trim() : null)
+                                    addToCart(product, defColor, sizeStr)
+                                  }}
+                                  className="text-[10px] text-light border border-dark-border hover:border-gold hover:text-gold px-2 py-1 rounded-sm transition-colors cursor-pointer"
+                                >
+                                  {sizeStr}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            const defSize = Array.isArray(product.sizes) ? product.sizes[0] : (product.sizes ? product.sizes.split(',')[0].trim() : null)
+                            const defColor = Array.isArray(product.colors) ? product.colors[0] : (product.colors ? product.colors.split(',')[0].trim() : null)
+                            addToCart(product, defColor, defSize)
+                          }}
+                          className="w-full bg-gold hover:bg-light text-dark-bg text-[10px] tracking-widest uppercase py-2 font-medium transition-colors rounded-sm cursor-pointer"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
+
+                    </div>
+                    <p className="text-[10px] text-muted tracking-widest uppercase font-light mb-1">{product.category}</p>
+                    <p className="text-sm text-light font-light tracking-wide line-clamp-1">{product.name}</p>
+                    <p className="text-sm text-gold font-light mt-1">Rs. {product.price?.toLocaleString()}</p>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+      )}
+
+      {/* ASYMMETRICAL PARALLAX LOOKBOOK */}
+      {lookbook.length > 0 && <ParallaxLookbook lookbook={lookbook} />}
     </>
   )
 }

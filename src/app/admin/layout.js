@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -42,6 +42,15 @@ const sidebarLinks = [
           </svg>
         ),
       },
+      {
+        name: 'Lookbook',
+        href: '/admin/lookbook',
+        icon: (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 0 0 1.5-1.5V5.25a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v14.25c0 .828.672 1.5 1.5 1.5Z" />
+          </svg>
+        ),
+      },
     ],
   },
   {
@@ -78,6 +87,34 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isAcceptingOrders, setIsAcceptingOrders] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.settings) {
+          setIsAcceptingOrders(data.settings.isAcceptingOrders)
+        }
+      })
+      .catch(err => console.error('Failed to fetch settings:', err))
+  }, [])
+
+  const toggleStoreStatus = async () => {
+    const newState = !isAcceptingOrders
+    setIsAcceptingOrders(newState)
+    try {
+      await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isAcceptingOrders: newState })
+      })
+      window.dispatchEvent(new CustomEvent('storeStatusChanged', { detail: newState }))
+    } catch (err) {
+      console.error('Failed to update settings:', err)
+      setIsAcceptingOrders(!newState) // revert on fail
+    }
+  }
 
   const toggleSidebar = () => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
@@ -90,7 +127,7 @@ export default function AdminLayout({ children }) {
   const closeMobile = () => setMobileOpen(false)
 
   return (
-    <div className="min-h-screen bg-dark-bg flex">
+    <div className="min-h-screen bg-dark-bg flex overflow-x-hidden">
       
       {/* Mobile overlay */}
       {mobileOpen && (
@@ -98,25 +135,19 @@ export default function AdminLayout({ children }) {
       )}
 
       {/* Sidebar */}
-      <motion.aside
-        animate={{ width: collapsed ? 80 : 260 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={`bg-dark-card border-r border-dark-border flex flex-col fixed left-0 top-0 bottom-0 z-40 overflow-hidden
+      <aside
+        className={`bg-dark-card border-r border-dark-border flex flex-col fixed left-0 top-0 bottom-0 z-40 overflow-hidden transition-all duration-300
+          ${collapsed ? 'w-[80px]' : 'w-[260px]'}
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:translate-x-0`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-5 border-b border-dark-border">
-          {!collapsed && (
-            <Link href="/admin" className="flex items-center gap-2.5" onClick={closeMobile}>
-              <div className="w-2 h-2 bg-gold rotate-45" />
-              <span className="text-sm tracking-[0.2em] font-light text-light">MINIMAL</span>
-            </Link>
-          )}
-          {collapsed && (
-            <div className="w-2 h-2 bg-gold rotate-45 mx-auto" />
-          )}
-          <button onClick={toggleSidebar} className="text-muted hover:text-light transition-colors flex-shrink-0">
+        <div className="h-16 flex items-center px-5 border-b border-dark-border overflow-hidden whitespace-nowrap">
+          <Link href="/admin" className={`flex items-center transition-all duration-300 ${collapsed ? 'gap-0' : 'gap-2.5'}`} onClick={closeMobile}>
+            <div className="w-2 h-2 bg-gold rotate-45 flex-shrink-0" />
+            <span className={`text-sm tracking-[0.2em] font-light text-light transition-all duration-300 overflow-hidden ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[200px]'}`}>MINIMAL</span>
+          </Link>
+          <button onClick={toggleSidebar} className="text-muted hover:text-light transition-colors flex-shrink-0 ml-auto">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d={collapsed && !mobileOpen ? "M8.25 4.5l7.5 7.5-7.5 7.5" : "M15.75 19.5 8.25 12l7.5-7.5"} />
             </svg>
@@ -124,15 +155,13 @@ export default function AdminLayout({ children }) {
         </div>
 
         {/* Nav Links */}
-        <nav className="flex-1 py-6 px-3 space-y-8 overflow-y-auto">
+        <nav className={`flex-1 py-6 px-3 overflow-y-auto overflow-x-hidden transition-all duration-300 ${collapsed ? 'space-y-2' : 'space-y-8'}`}>
           {sidebarLinks.map((group) => (
             <div key={group.section}>
-              {!collapsed && (
-                <p className="text-[10px] text-muted tracking-[0.2em] uppercase px-3 mb-3">
-                  {group.section}
-                </p>
-              )}
-              <div className="space-y-1">
+              <p className={`text-[10px] text-muted tracking-[0.2em] uppercase transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? 'opacity-0 max-w-0 h-0 mb-0 px-0' : 'opacity-100 max-w-[200px] h-auto mb-3 px-3'}`}>
+                {group.section}
+              </p>
+              <div className="space-y-2">
                 {group.items.map((item) => {
                   const isActive = pathname === item.href
                   return (
@@ -140,20 +169,20 @@ export default function AdminLayout({ children }) {
                       key={item.name}
                       href={item.href}
                       onClick={closeMobile}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-200 group
+                      className={`flex items-center px-3 py-2.5 rounded-sm transition-all duration-200 group overflow-hidden
                         ${isActive
                           ? 'bg-gold/10 text-gold'
                           : 'text-muted hover:text-light hover:bg-dark-bg'
-                        }`}
+                        } ${collapsed ? 'justify-center' : 'gap-3'}`}
                     >
-                      <span className={isActive ? 'text-gold' : 'text-muted group-hover:text-light transition-colors'}>
+                      <span className={`flex-shrink-0 ${isActive ? 'text-gold' : 'text-muted group-hover:text-light transition-colors'}`}>
                         {item.icon}
                       </span>
-                      {!collapsed && (
-                        <span className="text-sm font-light tracking-wide">{item.name}</span>
-                      )}
-                      {isActive && !collapsed && (
-                        <div className="ml-auto w-1 h-1 rounded-full bg-gold" />
+                      <span className={`text-sm font-light tracking-wide whitespace-nowrap transition-all duration-300 overflow-hidden ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[200px]'}`}>
+                        {item.name}
+                      </span>
+                      {isActive && (
+                        <div className={`ml-auto w-1 h-1 rounded-full bg-gold flex-shrink-0 transition-all duration-300 ${collapsed ? 'opacity-0 scale-0' : 'opacity-100 scale-100'}`} />
                       )}
                     </Link>
                   )
@@ -164,23 +193,21 @@ export default function AdminLayout({ children }) {
         </nav>
 
         {/* Bottom user info */}
-        {!collapsed && (
-          <div className="p-4 border-t border-dark-border">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
-                <span className="text-gold text-xs font-medium">A</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-light font-light truncate">Admin User</p>
-                <p className="text-[10px] text-muted tracking-wide">Super Admin</p>
-              </div>
+        <div className="p-4 border-t border-dark-border overflow-hidden whitespace-nowrap">
+          <div className={`flex items-center transition-all duration-300 ${collapsed ? 'justify-center gap-0' : 'gap-3'}`}>
+            <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-gold text-xs font-medium">A</span>
+            </div>
+            <div className={`flex-1 min-w-0 transition-all duration-300 overflow-hidden ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[200px]'}`}>
+              <p className="text-sm text-light font-light truncate">Admin User</p>
+              <p className="text-[10px] text-muted tracking-wide">Super Admin</p>
             </div>
           </div>
-        )}
-      </motion.aside>
+        </div>
+      </aside>
 
       {/* Main content */}
-      <main className={`flex-1 transition-all duration-300 md:ml-[80px] ${!collapsed ? 'md:ml-[260px]' : ''}`}>
+      <main className={`flex-1 overflow-x-hidden transition-all duration-300 md:ml-[80px] ${!collapsed ? 'md:ml-[260px]' : ''}`}>
         {/* Top bar */}
         <div className="h-16 border-b border-dark-border bg-dark-bg/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
@@ -194,9 +221,22 @@ export default function AdminLayout({ children }) {
               {sidebarLinks.flatMap(g => g.items).find(i => i.href === pathname)?.name || 'Dashboard'}
             </p>
           </div>
-          <Link href="/" className="text-xs text-muted hover:text-light tracking-widest uppercase transition-colors">
-            View Store
-          </Link>
+          <div className="flex items-center gap-6">
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="text-[10px] text-muted tracking-widest uppercase">
+                {isAcceptingOrders ? 'Store Open' : 'Store Closed'}
+              </span>
+              <button 
+                onClick={toggleStoreStatus}
+                className={`w-10 h-5 rounded-full relative transition-colors duration-300 ${isAcceptingOrders ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-red-500/20 border border-red-500/30'}`}
+              >
+                <div className={`w-3 h-3 rounded-full absolute top-1/2 -translate-y-1/2 transition-all duration-300 ${isAcceptingOrders ? 'bg-emerald-400 right-1' : 'bg-red-400 left-1'}`} />
+              </button>
+            </div>
+            <Link href="/" className="text-xs text-muted hover:text-light tracking-widest uppercase transition-colors">
+              View Store
+            </Link>
+          </div>
         </div>
 
         {/* Page content */}

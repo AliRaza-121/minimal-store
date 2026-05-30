@@ -24,12 +24,13 @@ export function CartProvider({ children }) {
 
   const addToCart = (product, color, size, quantity = 1) => {
     setCart((prev) => {
+      const productId = product._id || product.id
       const existing = prev.find(
-        (item) => item.id === product.id && item.color === color && item.size === size
+        (item) => item.id === productId && item.color === color && item.size === size
       )
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id && item.color === color && item.size === size
+          item.id === productId && item.color === color && item.size === size
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
@@ -37,10 +38,11 @@ export function CartProvider({ children }) {
       return [
         ...prev,
         {
-          id: product.id,
+          id: productId,
           name: product.name,
           price: product.price,
           category: product.category,
+          image: product.image,
           color,
           size,
           quantity,

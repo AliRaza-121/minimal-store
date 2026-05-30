@@ -46,6 +46,18 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    trending: {
+      type: Boolean,
+      default: false,
+    },
+    hoverImage: {
+      type: String,
+      default: '',
+    },
+    hoverImagePublicId: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 )

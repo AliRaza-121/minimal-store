@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCart } from '@/context/CartContext'
 
 export default function CartDrawer() {
@@ -74,8 +75,18 @@ export default function CartDrawer() {
                     className="flex gap-4 pb-4 border-b border-dark-border"
                   >
                     {/* Thumbnail */}
-                    <div className="w-20 h-24 bg-dark-card border border-dark-border flex-shrink-0 flex items-center justify-center">
-                      <span className="text-gold/30 text-lg">✦</span>
+                    <div className="w-20 h-24 bg-dark-card border border-dark-border flex-shrink-0 flex items-center justify-center relative overflow-hidden">
+                      {item.image ? (
+                        <Image 
+                          src={item.image.replace('/upload/', '/upload/w_100,f_auto,q_auto/')} 
+                          alt={item.name} 
+                          fill
+                          sizes="100px"
+                          className="object-cover" 
+                        />
+                      ) : (
+                        <span className="text-gold/30 text-lg">✦</span>
+                      )}
                     </div>
                     {/* Details */}
                     <div className="flex-1 min-w-0">

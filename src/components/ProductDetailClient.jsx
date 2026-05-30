@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCart } from '@/context/CartContext'
+import FavoriteButton from '@/components/FavoriteButton'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -55,11 +57,15 @@ export default function ProductDetailClient({ product }) {
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}>
             <div className="relative aspect-[3/4] bg-dark-card border border-dark-border overflow-hidden">
+              <FavoriteButton product={product} className="!top-4 !right-4 !w-10 !h-10" />
               {product.image ? (
-               <img 
+               <Image 
   src={product.image ? product.image.replace('/upload/', '/upload/w_600,f_auto,q_auto/') : ''} 
   alt={product.name} 
-  className="w-full h-full object-cover" 
+  fill
+  priority
+  sizes="(max-width: 1024px) 100vw, 50vw"
+  className="object-cover" 
 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -100,12 +106,15 @@ export default function ProductDetailClient({ product }) {
                   Color — <span className="text-muted font-light">{selectedColor || 'Select'}</span>
                 </p>
                 <div className="flex gap-3">
-                  {product.colors.map((color) => (
+                  {product.colors.map((color) => {
+                    const swatchColor = color.toLowerCase().replace(/ /g, '')
+                    return (
                     <button key={color} onClick={() => setSelectedColor(color)}
-                      className={`px-4 py-2 text-xs tracking-wide font-light border transition-all duration-300 ${selectedColor === color ? 'border-gold text-gold bg-gold/5' : 'border-dark-border text-muted hover:border-muted/50'}`}>
-                      {color}
-                    </button>
-                  ))}
+                      title={color}
+                      className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${selectedColor === color ? 'border-gold scale-110' : 'border-dark-border hover:scale-105'}`}
+                      style={{ backgroundColor: swatchColor }}
+                    />
+                  )})}
                 </div>
               </div>
             )}

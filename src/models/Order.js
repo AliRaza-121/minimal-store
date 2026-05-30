@@ -25,6 +25,16 @@ const orderSchema = new mongoose.Schema(
       enum: ['pending', 'confirmed', 'shipped', 'delivered'],
       default: 'pending',
     },
+    paymentMethod: {
+      type: String,
+      enum: ['cod', 'card', 'jazzcash', 'easypaisa', 'bank_transfer'],
+      default: 'cod',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
     customer: {
       name: String,
       email: String,

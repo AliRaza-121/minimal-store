@@ -2,6 +2,27 @@ import connectDB from '@/lib/db'
 import Product from '@/models/Product'
 import ProductDetailClient from '@/components/ProductDetailClient'
 
+export async function generateMetadata({ params }) {
+  const { id } = await params
+  try {
+    await connectDB()
+    const product = await Product.findById(id).lean()
+    if (!product) return {}
+
+    return {
+      title: product.name,
+      description: product.description || `Buy ${product.name} at MINIMAL.`,
+      openGraph: {
+        title: product.name,
+        description: product.description || `Buy ${product.name} at MINIMAL.`,
+        images: product.image ? [{ url: product.image }] : [],
+      },
+    }
+  } catch (error) {
+    return {}
+  }
+}
+
 export default async function ProductDetail({ params }) {
   const { id } = await params
   let product = null
