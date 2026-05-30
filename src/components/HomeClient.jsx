@@ -188,9 +188,12 @@ export default function HomeClient({ products, lookbook = [], trending = [] }) {
       {/* HERO */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <img 
+          <Image 
             src="/hero-bg.jpg" 
             alt="Hero background" 
+            fill
+            priority
+            fetchPriority="high"
             className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
           />
           <div className="absolute inset-0 bg-dark-bg/50" />
@@ -287,7 +290,6 @@ export default function HomeClient({ products, lookbook = [], trending = [] }) {
                   alt={filteredProducts[0].name} 
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  priority
                   className="object-cover" 
                 />
               ) : (
@@ -518,7 +520,6 @@ export default function HomeClient({ products, lookbook = [], trending = [] }) {
                             alt={product.name} 
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                            priority={i < 4}
                             className={`object-cover transition-opacity duration-500 ${product.hoverImage ? 'group-hover:opacity-0' : ''}`}
                           />
                         ) : (
